@@ -6,6 +6,65 @@ Outwork OS handles coordination, tracking, and triage so users can focus on work
 
 The system is built around Claude Code skills (slash commands) that read and write to a shared Supabase database. Context compounds over time as scan rules learn from feedback, memory persists across sessions, and log entries build a timeline.
 
+## Setup Guidance for Claude
+
+If a user asks you to help them set up Outwork OS, follow this approach:
+
+### Before you start
+
+Read the full README and SETUP.md from the repo. Understand what the user will need to provide before you begin walking them through it.
+
+The user will need to create accounts and credentials on several services. You cannot do this for them. Your job is to guide them through each step, explain what they need, and help them configure files and run commands once they have the credentials.
+
+### What requires human action (you cannot do these)
+
+- Create a Supabase account and project
+- Create a user in Supabase Authentication
+- Copy the Supabase project ID, URL, anon key, and service role key from the dashboard
+- Create a Google Cloud project and OAuth 2.0 credentials
+- Enable Google APIs (Gmail, Calendar, People, Drive) in Google Cloud Console
+- Add the OAuth redirect URI in Google Cloud Console
+- Complete the Google OAuth consent flow in the browser
+- Create a Todoist account and copy their API token
+- Create accounts and get API keys for any optional integrations (GitHub, Fireflies, Slack, etc.)
+
+### What you can help with
+
+- Cloning the repo
+- Creating and editing outworkos.config.yaml
+- Running the SQL migrations (walk them through pasting into Supabase SQL Editor, or run via Supabase MCP if available)
+- Running shell scripts (auth login, set-secret, google-auth)
+- Storing secrets in Vault via set-secret.sh
+- Creating the user_profiles row in the database
+- Configuring .mcp.json for their integrations
+- Testing that everything works
+
+### Recommended approach: interview-style setup
+
+Rather than dumping all the steps at once, interview the user one question at a time:
+
+1. "Have you used Claude Code before?" (gauge their comfort level)
+2. "Do you already have a Supabase account, or do we need to set one up?"
+3. Walk them through creating the Supabase project if needed, then ask them to paste the project ID, URL, and anon key
+4. Help them create outworkos.config.yaml with their details (email, name, timezone, domain)
+5. Walk them through running the three SQL migrations
+6. Help them create their Supabase auth user and store the service role key
+7. Run the auth login script together
+8. "Do you have Google Cloud credentials, or is this your first time?" Then walk through OAuth setup
+9. Ask about Todoist, then store the token
+10. Ask which optional integrations they want, and set up each one
+11. Verify everything works by running /scan or /whats-next
+
+This interview style keeps the user from being overwhelmed. Each step builds on the last. Confirm each step worked before moving to the next.
+
+### Key things to know
+
+- outworkos.config.yaml is gitignored and never committed. It holds non-secret settings.
+- All API keys and tokens go into Supabase Vault via scripts/set-secret.sh, never into config files.
+- Auth tokens are stored in macOS Keychain (service names: "outworkos" and "outworkos-cli").
+- The SessionStart hook (discover-projects.sh) loads the config, authenticates, and injects the project manifest into context automatically.
+- Every database table has row-level security scoped to the authenticated user.
+
 ## Core Skills
 
 - [/scan](https://github.com/MattVOLTA/outworkos_diy/tree/main/skills/scan): Cross-project inbox scan that filters noise, routes signals to projects, creates Todoist tasks for gaps, and ranks priorities
@@ -27,21 +86,23 @@ The system is built around Claude Code skills (slash commands) that read and wri
 - [RLS Policies](https://github.com/MattVOLTA/outworkos_diy/blob/main/migrations/002_rls_policies.sql): Row-level security policies scoping all data to the authenticated user
 - [Vault Functions](https://github.com/MattVOLTA/outworkos_diy/blob/main/migrations/003_vault_functions.sql): SECURITY DEFINER functions for per-user secret storage in Supabase Vault
 
-## Required Services
+## Best With
 
-- Supabase: Database, authentication, and secrets vault
-- Google Workspace: Gmail, Calendar, Contacts, Drive (requires user's own Google Cloud OAuth credentials)
-- Todoist: Task management via REST API
+- Supabase: Database, authentication, and secrets vault (required)
+- Google Workspace: Gmail, Calendar, Contacts, Drive (required, needs user's own Google Cloud OAuth credentials)
+- Todoist: Task management via REST API (required)
+- GitHub: Issue tracking and PR workflow
+- Fireflies: Meeting transcript processing
+- Slack: DM signal source for inbox scanning
 
 ## Optional Integrations
 
-- [GitHub](https://github.com/MattVOLTA/outworkos_diy/tree/main/skills/start-work): Issue tracking and PR workflow
-- [Fireflies](https://github.com/MattVOLTA/outworkos_diy/tree/main/skills/process-meeting): Meeting transcript processing
-- [Slack](https://github.com/MattVOLTA/outworkos_diy/tree/main/skills/scan): DM signal source for inbox scanning
 - [Pushover](https://github.com/MattVOLTA/outworkos_diy/tree/main/skills/notify-user): Push notifications
 - [LinkedIn](https://github.com/MattVOLTA/outworkos_diy/tree/main/skills/post-linkedin): Post publishing
 - [Netlify](https://github.com/MattVOLTA/outworkos_diy): Deployment management
 - [Xero](https://github.com/MattVOLTA/outworkos_diy/tree/main/skills/xero-connect): Accounting integration
+- Limitless Pendant: Ambient meeting capture
+- fal.ai: Image and video generation
 
 ## Source Code
 
