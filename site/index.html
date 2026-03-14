@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Outwork OS | Spend Your Time on Work That Actually Matters</title>
+<meta name="description" content="A personal operating system for knowledge workers. 30+ slash commands that connect your email, calendar, tasks, and meetings through Claude Code.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400;1,700&family=JetBrains+Mono:wght@400;500;700&family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-deep: #080c14;
+  --bg-surface: #0f1520;
+  --bg-card: #151d2e;
+  --bg-elevated: #1a2540;
+  --border: #1e2d4a;
+  --border-light: #2a3f65;
+  --text-primary: #e4e9f2;
+  --text-secondary: #94a3bb;
+  --text-muted: #5e7090;
+  --accent-amber: #f0b800;
+  --accent-amber-dim: #c49600;
+  --accent-green: #22c55e;
+  --accent-green-dim: #166534;
+  --accent-blue: #38bdf8;
+  --accent-red: #f87171;
+  --accent-red-dim: #7f1d1d;
+  --font-display: 'Lora', Georgia, serif;
+  --font-body: 'Nunito Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.65;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* === NOISE TEXTURE OVERLAY === */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* === NAV === */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 1.25rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(20px);
+  background: rgba(8, 12, 20, 0.8);
+  border-bottom: 1px solid rgba(30, 45, 74, 0.5);
+}
+
+.nav-logo {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-amber);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+}
+
+.nav-logo span { color: var(--text-secondary); font-weight: 400; }
+
+.nav-github {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 0.5rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.nav-github:hover {
+  color: var(--accent-amber);
+  border-color: var(--accent-amber);
+  background: rgba(240, 184, 0, 0.05);
+}
+
+/* === SECTIONS === */
+section { padding: 7rem 2rem; }
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* === HERO === */
+.hero {
+  padding: 10rem 2rem 7rem;
+  position: relative;
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(ellipse, rgba(240, 184, 0, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* === HERO ILLUSTRATIONS === */
+.hero-illustrations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero .container { position: relative; z-index: 1; }
+
+.hero-illust {
+  position: absolute;
+  opacity: 0;
+  animation: illustFloat 0.8s ease forwards, gentleBob 6s ease-in-out infinite;
+  animation-fill-mode: forwards, none;
+}
+
+.hero-illust svg {
+  stroke: var(--text-muted);
+  stroke-width: 1.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hero-illust.accent svg { stroke: var(--accent-amber); opacity: 0.5; }
+.hero-illust.green svg { stroke: var(--accent-green); opacity: 0.35; }
+
+.hero-illust.shape svg {
+  stroke-width: 1;
+}
+
+@keyframes illustFloat {
+  from { opacity: 0; transform: translateY(12px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes gentleBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@media (max-width: 768px) {
+  .hero-illustrations { display: none; }
+}
+
+.hero-tag {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent-amber);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.hero-tag::before {
+  content: '';
+  display: block;
+  width: 2rem;
+  height: 1px;
+  background: var(--accent-amber);
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  font-weight: 900;
+  line-height: 1.05;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  max-width: 800px;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--accent-amber);
+}
+
+.hero-sub {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  max-width: 560px;
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+}
+
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--bg-deep);
+  background: var(--accent-amber);
+  text-decoration: none;
+  padding: 0.9rem 2rem;
+  border-radius: 6px;
+  transition: all 0.25s;
+  letter-spacing: 0.02em;
+}
+
+.hero-cta:hover {
+  background: #ffc800;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 30px rgba(240, 184, 0, 0.2);
+}
+
+.hero-cta svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* === PROBLEM SECTION === */
+.problem {
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent-amber);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.section-heading {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 900;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+
+.section-sub {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin-bottom: 3.5rem;
+}
+
+.problem-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.problem-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.problem-card:hover {
+  border-color: var(--border-light);
+  transform: translateY(-2px);
+}
+
+.problem-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent-amber);
+  opacity: 0.4;
+}
+
+.problem-number {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: rgba(240, 184, 0, 0.08);
+  position: absolute;
+  top: 0.5rem;
+  right: 1.25rem;
+  line-height: 1;
+}
+
+.problem-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+}
+
+.problem-card p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* === COMMANDS SECTION === */
+.commands { background: var(--bg-deep); }
+
+.commands-intro {
+  margin-bottom: 3.5rem;
+}
+
+.command-group {
+  margin-bottom: 2.5rem;
+}
+
+.command-group-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  padding-left: 0.25rem;
+}
+
+.command-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 0.75rem;
+}
+
+.command-item {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.1rem 1.4rem;
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  transition: all 0.2s;
+}
+
+.command-item:hover {
+  border-color: var(--accent-green-dim);
+  background: rgba(34, 197, 94, 0.03);
+}
+
+.command-name {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent-green);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.command-desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* === TERMINAL DEMO === */
+.terminal {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 3rem;
+}
+
+.terminal-bar {
+  background: var(--bg-card);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.terminal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border-light);
+}
+
+.terminal-dot:nth-child(1) { background: #f87171; }
+.terminal-dot:nth-child(2) { background: #fbbf24; }
+.terminal-dot:nth-child(3) { background: #34d399; }
+
+.terminal-title {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-left: 0.5rem;
+}
+
+.terminal-body {
+  padding: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.8;
+}
+
+.terminal-line {
+  display: flex;
+  gap: 0;
+  margin-bottom: 0.25rem;
+}
+
+.terminal-prompt { color: var(--accent-green); }
+.terminal-cmd { color: var(--text-primary); }
+.terminal-output { color: var(--text-muted); padding-left: 0; }
+.terminal-output.highlight { color: var(--accent-amber); }
+.terminal-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1.1em;
+  background: var(--accent-amber);
+  margin-left: 2px;
+  animation: blink 1s step-end infinite;
+  vertical-align: text-bottom;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* === HOW IT WORKS === */
+.how-it-works {
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin-top: 2rem;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 2rem;
+  padding: 2.5rem 0;
+  border-bottom: 1px solid var(--border);
+  align-items: start;
+}
+
+.step:last-child { border-bottom: none; }
+
+.step-number {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: var(--accent-amber);
+  opacity: 0.3;
+  line-height: 1;
+}
+
+.step h3 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.step p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.step code {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  background: var(--bg-card);
+  color: var(--accent-green);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+/* === STACK === */
+.stack { background: var(--bg-deep); }
+
+.arch-diagram {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin: 3rem 0;
+}
+
+.arch-layer {
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  position: relative;
+}
+
+.arch-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 500;
+  position: relative;
+}
+
+.arch-box.primary {
+  background: var(--bg-elevated);
+  border-color: var(--accent-amber-dim);
+  color: var(--accent-amber);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.arch-box.skills {
+  border-color: var(--accent-green-dim);
+  color: var(--accent-green);
+}
+
+.arch-connector {
+  width: 1px;
+  height: 2rem;
+  background: var(--border-light);
+  margin: 0 auto;
+  position: relative;
+}
+
+.arch-connector::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 7px;
+  height: 7px;
+  border-right: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.arch-services {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 600px;
+}
+
+.arch-service {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.arch-service strong {
+  display: block;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin: 3.5rem 0;
+  padding: 2rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--accent-amber);
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.integrations {
+  margin-top: 2rem;
+}
+
+.integrations h3 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.integration-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.integration-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  transition: all 0.2s;
+}
+
+.integration-tag:hover {
+  border-color: var(--border-light);
+  color: var(--text-primary);
+}
+
+.integration-tag.core {
+  border-color: var(--accent-green-dim);
+  color: var(--accent-green);
+}
+
+/* === FOOTER CTA === */
+.footer-cta {
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border);
+  text-align: center;
+  padding: 6rem 2rem;
+}
+
+.footer-cta h2 {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 900;
+  margin-bottom: 1rem;
+}
+
+.footer-cta h2 em {
+  font-style: italic;
+  color: var(--accent-amber);
+}
+
+.footer-cta p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin-bottom: 2.5rem;
+}
+
+.footer-cta .hero-cta {
+  font-size: 1rem;
+  padding: 1rem 2.5rem;
+}
+
+footer {
+  padding: 2rem;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+}
+
+footer a {
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+footer a:hover { color: var(--accent-amber); }
+
+/* === HERO ENTRANCE ANIMATION === */
+@keyframes heroFadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-anim {
+  animation: heroFadeUp 0.7s ease forwards;
+}
+
+.hero-anim-1 { animation-delay: 0.15s; opacity: 0; }
+.hero-anim-2 { animation-delay: 0.3s; opacity: 0; }
+.hero-anim-3 { animation-delay: 0.45s; opacity: 0; }
+
+/* === SCROLL ANIMATIONS === */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  section { padding: 4rem 1.25rem; }
+  .hero { padding: 7rem 1.25rem 4rem; min-height: auto; }
+
+  .problem-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .command-list {
+    grid-template-columns: 1fr;
+  }
+
+  .step {
+    grid-template-columns: 50px 1fr;
+    gap: 1rem;
+  }
+
+  .step-number { font-size: 2.5rem; }
+
+  .arch-services {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-bar {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .terminal-body {
+    font-size: 0.75rem;
+    padding: 1rem;
+  }
+
+  nav { padding: 1rem 1.25rem; }
+}
+
+@media (max-width: 480px) {
+  .hero h1 { font-size: 2.2rem; }
+  .stats-bar { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">outwork <span>OS</span></a>
+  <a href="https://github.com/MattVOLTA/outworkos_diy" class="nav-github" target="_blank" rel="noopener">
+    View on GitHub
+  </a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <!-- Randomly generated illustrations -->
+  <div class="hero-illustrations" id="heroIllust"></div>
+
+  <div class="container">
+    <div class="hero-tag hero-anim">Open Source Personal OS</div>
+    <h1 class="hero-anim hero-anim-1">
+      Spend your time on work<br>
+      that <em>actually matters.</em>
+    </h1>
+    <p class="hero-sub hero-anim hero-anim-2">
+      Outwork OS is a personal operating system that handles the coordination, tracking, and triage so you can focus on the work that engages you. 30+ slash commands, powered by Claude Code.
+    </p>
+    <a href="https://github.com/MattVOLTA/outworkos_diy" class="hero-cta hero-anim hero-anim-3" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      View on GitHub
+    </a>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem" id="problem">
+  <div class="container">
+    <div class="section-label reveal">Imagine this</div>
+    <h2 class="section-heading reveal reveal-delay-1">What if the busywork<br>just handled itself?</h2>
+    <p class="section-sub reveal reveal-delay-2">Coordination, triage, follow-up tracking, meeting prep. This work has to happen, but it doesn't have to be you doing it. Reclaim that time for the things that get the most value out of your contribution.</p>
+
+    <div class="problem-grid">
+      <div class="problem-card reveal">
+        <div class="problem-number">01</div>
+        <h3>Your inbox, triaged before you open it.</h3>
+        <p>Noise archived. Signals routed to the right project. Gaps flagged as tasks. You sit down and immediately see what actually needs your attention, not 40 emails competing for it.</p>
+      </div>
+      <div class="problem-card reveal reveal-delay-1">
+        <div class="problem-number">02</div>
+        <h3>Nothing falls through the cracks.</h3>
+        <p>Every follow-up from every meeting is tracked. If you promised something and haven't delivered, the system flags it before anyone has to ask. You stay ahead instead of catching up.</p>
+      </div>
+      <div class="problem-card reveal reveal-delay-2">
+        <div class="problem-number">03</div>
+        <h3>Walk into every meeting with full context.</h3>
+        <p>Past conversations, email threads, attendee backgrounds all pulled together before the call starts. You show up prepared and present instead of scrambling to remember what happened last time.</p>
+      </div>
+      <div class="problem-card reveal reveal-delay-3">
+        <div class="problem-number">04</div>
+        <h3>One system that connects everything.</h3>
+        <p>Your email, calendar, tasks, and meeting notes all feed into one shared database. Context compounds over time. The more you use it, the more it understands your work and your priorities.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT IT DOES -->
+<section class="commands" id="commands">
+  <div class="container">
+    <div class="commands-intro">
+      <div class="section-label reveal">How it works</div>
+      <h2 class="section-heading reveal reveal-delay-1">Slash commands that give<br>you your time back.</h2>
+      <p class="section-sub reveal reveal-delay-2">Type a command. Outwork OS handles the coordination: reading your email, checking your calendar, scanning your tasks, and surfacing what actually needs you. Context compounds over time, so it gets better the more you use it.</p>
+    </div>
+
+    <div class="command-group reveal">
+      <div class="command-group-label">Daily Workflow</div>
+      <div class="command-list">
+        <div class="command-item">
+          <span class="command-name">/scan</span>
+          <span class="command-desc">Scans inbox, filters noise, routes to projects, creates tasks for gaps</span>
+        </div>
+        <div class="command-item">
+          <span class="command-name">/whats-next</span>
+          <span class="command-desc">Syncs everything to recommend the single next thing to work on</span>
+        </div>
+        <div class="command-item">
+          <span class="command-name">/email-composer</span>
+          <span class="command-desc">Drafts emails in your natural voice with proper threading</span>
+        </div>
+        <div class="command-item">
+          <span class="command-name">/risk</span>
+          <span class="command-desc">Finds tasks where you've dropped follow-through</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="command-group reveal">
+      <div class="command-group-label">Meetings</div>
+      <div class="command-list">
+        <div class="command-item">
+          <span class="command-name">/meeting-prep</span>
+          <span class="command-desc">Researches attendees and pulls context from past conversations</span>
+        </div>
+        <div class="command-item">
+          <span class="command-name">/process-meeting</span>
+          <span class="command-desc">Turns recordings into summaries with action items</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="command-group reveal">
+      <div class="command-group-label">Development</div>
+      <div class="command-list">
+        <div class="command-item">
+          <span class="command-name">/start-work</span>
+          <span class="command-desc">Picks up a GitHub issue, creates a branch, sets context</span>
+        </div>
+        <div class="command-item">
+          <span class="command-name">/ship-it</span>
+          <span class="command-desc">Commits, pushes, and opens a PR</span>
+        </div>
+        <div class="command-item">
+          <span class="command-name">/tdd</span>
+          <span class="command-desc">Test-driven development: test first, then implementation</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="command-group reveal">
+      <div class="command-group-label">Track & Review</div>
+      <div class="command-list">
+        <div class="command-item">
+          <span class="command-name">/log</span>
+          <span class="command-desc">Records what you accomplished to a persistent timeline</span>
+        </div>
+        <div class="command-item">
+          <span class="command-name">/weekly-review</span>
+          <span class="command-desc">Cross-project retrospective across all your work</span>
+        </div>
+        <div class="command-item">
+          <span class="command-name">/context-map</span>
+          <span class="command-desc">Maps a project's people, systems, and data sources</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Terminal Demo -->
+    <div class="terminal reveal">
+      <div class="terminal-bar">
+        <div class="terminal-dot"></div>
+        <div class="terminal-dot"></div>
+        <div class="terminal-dot"></div>
+        <span class="terminal-title">claude code // outwork os</span>
+      </div>
+      <div class="terminal-body">
+        <div class="terminal-line">
+          <span class="terminal-prompt">$ </span>
+          <span class="terminal-cmd">/scan</span>
+        </div>
+        <div class="terminal-line">
+          <span class="terminal-output">Scanning Gmail... 47 messages since last scan</span>
+        </div>
+        <div class="terminal-line">
+          <span class="terminal-output">Archived 31 noise (promotions, newsletters, automated)</span>
+        </div>
+        <div class="terminal-line">
+          <span class="terminal-output">Routed 12 signals to 6 projects</span>
+        </div>
+        <div class="terminal-line">
+          <span class="terminal-output">Created 3 Todoist tasks for gaps</span>
+        </div>
+        <div class="terminal-line">&nbsp;</div>
+        <div class="terminal-line">
+          <span class="terminal-output highlight">Priority 1: Reply to Sarah re: Q2 budget (Sprint)</span>
+        </div>
+        <div class="terminal-line">
+          <span class="terminal-output highlight">Priority 2: Review PR #47, blocking deploy (Acme)</span>
+        </div>
+        <div class="terminal-line">
+          <span class="terminal-output highlight">Priority 3: Prep for 2pm call with investors</span>
+        </div>
+        <div class="terminal-line">&nbsp;</div>
+        <div class="terminal-line">
+          <span class="terminal-prompt">$ </span>
+          <span class="terminal-cmd">/whats-next</span>
+          <span class="terminal-cursor"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-it-works" id="how">
+  <div class="container">
+    <div class="section-label reveal">Getting started</div>
+    <h2 class="section-heading reveal reveal-delay-1">Clone it. Configure it. Use it.</h2>
+    <p class="section-sub reveal reveal-delay-2">No signup. No SaaS. You own the whole thing.</p>
+
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-number">01</div>
+        <div>
+          <h3>Clone the repo and configure</h3>
+          <p>Copy <code>outworkos.config.example.yaml</code>, fill in your email, timezone, and Supabase project. That's your identity file. It never gets committed.</p>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-number">02</div>
+        <div>
+          <h3>Connect your services</h3>
+          <p>Run three SQL migrations to set up your database. Store your Google OAuth and Todoist credentials in Supabase Vault. Authenticate with <code>outworkos-auth-login.sh</code>.</p>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-number">03</div>
+        <div>
+          <h3>Open Claude Code</h3>
+          <p>The SessionStart hook loads your config, authenticates, and injects your project manifest into context. Type <code>/scan</code> and watch it go.</p>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-number">04</div>
+        <div>
+          <h3>Your system compounds</h3>
+          <p>Scan rules learn from your feedback. Memory persists across sessions. Log entries build a timeline. Context maps connect projects to people. The more you use it, the more it knows.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- THE STACK -->
+<section class="stack" id="stack">
+  <div class="container">
+    <div class="section-label reveal">The stack</div>
+    <h2 class="section-heading reveal reveal-delay-1">Database-first. Everything in Vault.<br>RLS on every table.</h2>
+
+    <div class="arch-diagram reveal">
+      <div class="arch-layer">
+        <div class="arch-box primary">You &rarr; Claude Code</div>
+      </div>
+      <div class="arch-connector"></div>
+      <div class="arch-layer">
+        <div class="arch-box skills">30+ Skills (slash commands)</div>
+      </div>
+      <div class="arch-connector"></div>
+      <div class="arch-services">
+        <div class="arch-service">
+          <strong>Supabase</strong>
+          Database + Auth + Vault
+        </div>
+        <div class="arch-service">
+          <strong>Google</strong>
+          Gmail + Calendar + Drive
+        </div>
+        <div class="arch-service">
+          <strong>Todoist</strong>
+          Tasks + Projects
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-bar reveal">
+      <div class="stat">
+        <div class="stat-value">31</div>
+        <div class="stat-label">Skills</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">10</div>
+        <div class="stat-label">Tables with RLS</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">0</div>
+        <div class="stat-label">Plaintext secrets</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">&infin;</div>
+        <div class="stat-label">Context that compounds</div>
+      </div>
+    </div>
+
+    <div class="integrations reveal">
+      <h3>Optional integrations</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;">Enable what you need. Store API keys in Vault. Everything is opt-in.</p>
+      <div class="integration-tags">
+        <span class="integration-tag core">Supabase</span>
+        <span class="integration-tag core">Google Workspace</span>
+        <span class="integration-tag core">Todoist</span>
+        <span class="integration-tag">GitHub</span>
+        <span class="integration-tag">Fireflies</span>
+        <span class="integration-tag">Slack</span>
+        <span class="integration-tag">Pushover</span>
+        <span class="integration-tag">LinkedIn</span>
+        <span class="integration-tag">Netlify</span>
+        <span class="integration-tag">Xero</span>
+        <span class="integration-tag">Limitless Pendant</span>
+        <span class="integration-tag">fal.ai</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER CTA -->
+<section class="footer-cta">
+  <div class="container">
+    <h2 class="reveal">Build <em>your own.</em></h2>
+    <p class="reveal reveal-delay-1">Open source. Clone it, make it yours, and start spending your time on the work that excites you.</p>
+    <a href="https://github.com/MattVOLTA/outworkos_diy" class="hero-cta reveal reveal-delay-2" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" fill="currentColor" width="18" height="18"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      View on GitHub
+    </a>
+  </div>
+</section>
+
+<footer>
+  <p>Built by <a href="https://lesswrongovertime.com" target="_blank" rel="noopener">Matt Cooper</a> / <a href="https://lesswrongovertime.com" target="_blank" rel="noopener">lesswrongovertime.com</a></p>
+</footer>
+
+<script>
+// Scroll-triggered reveal animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, {
+  threshold: 0.1,
+  rootMargin: '0px 0px -40px 0px'
+});
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// === RANDOM HERO ILLUSTRATIONS ===
+(function() {
+  const container = document.getElementById('heroIllust');
+  if (!container) return;
+
+  const icons = [
+    // Envelope
+    { svg: '<svg width="70" height="52" viewBox="0 0 80 60"><rect x="8" y="18" width="64" height="38" rx="3"/><polyline points="8,18 40,42 72,18"/><rect x="20" y="4" width="40" height="30" rx="2"/><line x1="28" y1="12" x2="52" y2="12"/><line x1="28" y1="18" x2="48" y2="18"/><line x1="28" y1="24" x2="44" y2="24"/></svg>', cls: '' },
+    // Clock
+    { svg: '<svg width="56" height="56" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26"/><circle cx="32" cy="32" r="2"/><line x1="32" y1="32" x2="32" y2="16"/><line x1="32" y1="32" x2="44" y2="28"/><line x1="32" y1="4" x2="32" y2="8"/><line x1="32" y1="56" x2="32" y2="60"/><line x1="4" y1="32" x2="8" y2="32"/><line x1="56" y1="32" x2="60" y2="32"/></svg>', cls: 'accent' },
+    // Keyboard
+    { svg: '<svg width="88" height="44" viewBox="0 0 100 50"><rect x="2" y="2" width="96" height="46" rx="5"/><rect x="8" y="8" width="10" height="8" rx="1.5"/><rect x="21" y="8" width="10" height="8" rx="1.5"/><rect x="34" y="8" width="10" height="8" rx="1.5"/><rect x="47" y="8" width="10" height="8" rx="1.5"/><rect x="60" y="8" width="10" height="8" rx="1.5"/><rect x="73" y="8" width="10" height="8" rx="1.5"/><rect x="12" y="20" width="10" height="8" rx="1.5"/><rect x="25" y="20" width="10" height="8" rx="1.5"/><rect x="38" y="20" width="10" height="8" rx="1.5"/><rect x="51" y="20" width="10" height="8" rx="1.5"/><rect x="64" y="20" width="10" height="8" rx="1.5"/><rect x="20" y="32" width="10" height="8" rx="1.5"/><rect x="33" y="32" width="34" height="8" rx="1.5"/></svg>', cls: '' },
+    // Monitor
+    { svg: '<svg width="78" height="70" viewBox="0 0 90 80"><rect x="5" y="2" width="80" height="56" rx="4"/><line x1="35" y1="58" x2="35" y2="70"/><line x1="55" y1="58" x2="55" y2="70"/><line x1="25" y1="70" x2="65" y2="70"/><line x1="15" y1="14" x2="30" y2="14" stroke-opacity="0.5"/><line x1="15" y1="22" x2="45" y2="22" stroke-opacity="0.5"/><line x1="15" y1="30" x2="35" y2="30" stroke-opacity="0.5"/><line x1="20" y1="38" x2="50" y2="38" stroke-opacity="0.5"/></svg>', cls: '' },
+    // Calendar
+    { svg: '<svg width="56" height="62" viewBox="0 0 64 72"><rect x="4" y="12" width="56" height="56" rx="4"/><line x1="4" y1="26" x2="60" y2="26"/><line x1="18" y1="4" x2="18" y2="18"/><line x1="46" y1="4" x2="46" y2="18"/><line x1="18" y1="26" x2="18" y2="68"/><line x1="32" y1="26" x2="32" y2="68"/><line x1="46" y1="26" x2="46" y2="68"/><line x1="4" y1="40" x2="60" y2="40"/><line x1="4" y1="54" x2="60" y2="54"/></svg>', cls: 'green' },
+    // Checklist
+    { svg: '<svg width="48" height="62" viewBox="0 0 56 72"><rect x="4" y="4" width="48" height="64" rx="3"/><rect x="12" y="14" width="8" height="8" rx="1"/><polyline points="13,19 16,22 21,15" stroke-width="2"/><line x1="26" y1="18" x2="44" y2="18"/><rect x="12" y="28" width="8" height="8" rx="1"/><polyline points="13,33 16,36 21,29" stroke-width="2"/><line x1="26" y1="32" x2="40" y2="32"/><rect x="12" y="42" width="8" height="8" rx="1"/><line x1="26" y1="46" x2="42" y2="46"/></svg>', cls: '' },
+    // Coffee
+    { svg: '<svg width="42" height="48" viewBox="0 0 48 56"><path d="M8,20 L8,44 Q8,52 16,52 L28,52 Q36,52 36,44 L36,20"/><line x1="6" y1="20" x2="38" y2="20"/><path d="M36,26 Q46,26 46,34 Q46,42 36,42"/><path d="M14,14 Q14,8 18,8" fill="none" stroke-opacity="0.4"/><path d="M22,12 Q22,4 26,4" fill="none" stroke-opacity="0.4"/><path d="M30,14 Q30,8 34,8" fill="none" stroke-opacity="0.4"/></svg>', cls: 'accent' },
+    // Terminal
+    { svg: '<svg width="64" height="48" viewBox="0 0 72 56"><rect x="2" y="2" width="68" height="52" rx="4"/><line x1="2" y1="14" x2="70" y2="14"/><circle cx="10" cy="8" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="26" cy="8" r="2"/><polyline points="10,24 18,30 10,36" stroke-width="2"/><line x1="22" y1="36" x2="40" y2="36"/></svg>', cls: 'green' },
+  ];
+
+  const shapes = [
+    { svg: '<svg width="8" height="8"><circle cx="4" cy="4" r="3" fill="#5e7090" stroke="none" opacity="0.3"/></svg>' },
+    { svg: '<svg width="6" height="6"><circle cx="3" cy="3" r="2.5" fill="#f0b800" stroke="none" opacity="0.2"/></svg>' },
+    { svg: '<svg width="14" height="12"><polygon points="7,1 13,11 1,11" fill="none" stroke="#5e7090" stroke-width="1.2" opacity="0.2"/></svg>' },
+    { svg: '<svg width="16" height="16"><path d="M8,1 L9.5,6 L15,6 L10.5,9 L12,15 L8,11 L4,15 L5.5,9 L1,6 L6.5,6 Z" fill="none" stroke="#f0b800" stroke-width="1" opacity="0.2"/></svg>' },
+    { svg: '<svg width="18" height="18"><circle cx="9" cy="9" r="7" fill="none" stroke="#5e7090" stroke-width="1" opacity="0.15"/></svg>' },
+    { svg: '<svg width="12" height="12"><line x1="6" y1="1" x2="6" y2="11" stroke="#22c55e" stroke-width="1" opacity="0.2"/><line x1="1" y1="6" x2="11" y2="6" stroke="#22c55e" stroke-width="1" opacity="0.2"/></svg>' },
+  ];
+
+  // Place icons randomly, avoiding the center text zone
+  const placed = [];
+
+  function overlaps(x, y, w, h) {
+    for (const p of placed) {
+      if (x < p.x + p.w + 20 && x + w + 20 > p.x && y < p.y + p.h + 20 && y + h + 20 > p.y) return true;
+    }
+    return false;
+  }
+
+  function randomPos(w, h, attempts) {
+    for (let i = 0; i < (attempts || 60); i++) {
+      const x = Math.random() * (window.innerWidth - w);
+      const y = Math.random() * 90; // percentage
+
+      // Avoid center text zone (roughly 15%-65% horizontal, 30%-75% vertical)
+      const xPct = x / window.innerWidth * 100;
+      if (xPct > 12 && xPct < 68 && y > 25 && y < 70) continue;
+
+      if (!overlaps(x, y * 10, w, h)) {
+        placed.push({ x, y: y * 10, w, h });
+        return { x, y };
+      }
+    }
+    return null;
+  }
+
+  // Place 12-16 icons (some duplicated for density)
+  const iconPool = [...icons, ...icons.slice(0, 6)]; // 14 total
+  iconPool.sort(() => Math.random() - 0.5);
+
+  iconPool.forEach((icon, i) => {
+    const pos = randomPos(80, 70);
+    if (!pos) return;
+
+    const div = document.createElement('div');
+    div.className = 'hero-illust' + (icon.cls ? ' ' + icon.cls : '');
+    div.innerHTML = icon.svg;
+    div.style.left = pos.x + 'px';
+    div.style.top = pos.y + '%';
+    div.style.animationDelay = (i * 0.12) + 's, ' + (i * 0.4 + 1) + 's';
+
+    // Random slight rotation for organic feel
+    const rot = (Math.random() - 0.5) * 16;
+    div.style.setProperty('--rot', rot + 'deg');
+    div.querySelector('svg').style.transform = 'rotate(' + rot + 'deg)';
+
+    container.appendChild(div);
+  });
+
+  // Place 12-18 small decorative shapes
+  const shapeCount = 12 + Math.floor(Math.random() * 7);
+  for (let i = 0; i < shapeCount; i++) {
+    const shape = shapes[Math.floor(Math.random() * shapes.length)];
+    const pos = randomPos(20, 20, 30);
+    if (!pos) continue;
+
+    const div = document.createElement('div');
+    div.className = 'hero-illust shape';
+    div.innerHTML = shape.svg;
+    div.style.left = pos.x + 'px';
+    div.style.top = pos.y + '%';
+    div.style.animationDelay = (Math.random() * 0.8) + 's, ' + (Math.random() * 3 + 1) + 's';
+    container.appendChild(div);
+  }
+})();
+</script>
+
+</body>
+</html>

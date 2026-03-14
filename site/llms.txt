@@ -1,0 +1,48 @@
+# Outwork OS
+
+> Outwork OS is an open-source personal operating system for knowledge workers, built on Claude Code. It provides 30+ slash commands that connect email, calendar, tasks, and meetings through a database-first architecture using Supabase, Google Workspace, and Todoist.
+
+Outwork OS handles coordination, tracking, and triage so users can focus on work that engages them. It runs entirely locally on macOS, with all data stored in the user's own Supabase instance. There is no SaaS, no hosted service. Users clone the repo, configure it, and own the whole system.
+
+The system is built around Claude Code skills (slash commands) that read and write to a shared Supabase database. Context compounds over time as scan rules learn from feedback, memory persists across sessions, and log entries build a timeline.
+
+## Core Skills
+
+- [/scan](https://github.com/MattVOLTA/outworkos_diy/tree/main/skills/scan): Cross-project inbox scan that filters noise, routes signals to projects, creates Todoist tasks for gaps, and ranks priorities
+- [/whats-next](https://github.com/MattVOLTA/outworkos_diy/tree/main/skills/whats-next): Syncs Todoist, Gmail, Calendar, and Fireflies to recommend the next task to work on
+- [/email-composer](https://github.com/MattVOLTA/outworkos_diy/tree/main/skills/email-composer): Drafts and sends emails with natural writing style, proper threading, and signature handling
+- [/risk](https://github.com/MattVOLTA/outworkos_diy/tree/main/skills/risk): Finds open tasks where follow-through is missing by cross-referencing sent mail, logs, and calendar
+- [/meeting-prep](https://github.com/MattVOLTA/outworkos_diy/tree/main/skills/meeting-prep): Researches attendees, pulls email history and past meetings to produce a pre-call briefing
+- [/log](https://github.com/MattVOLTA/outworkos_diy/tree/main/skills/log): Records session accomplishments to a persistent database timeline
+
+## Setup and Configuration
+
+- [README](https://github.com/MattVOLTA/outworkos_diy/blob/main/README.md): Full project overview, skill catalog, architecture, and quick start guide
+- [SETUP.md](https://github.com/MattVOLTA/outworkos_diy/blob/main/SETUP.md): Step-by-step installation guide covering Supabase, Google OAuth, Todoist, and optional integrations
+- [Config Template](https://github.com/MattVOLTA/outworkos_diy/blob/main/outworkos.config.example.yaml): Example configuration file showing all available settings
+
+## Architecture
+
+- [Database Schema](https://github.com/MattVOLTA/outworkos_diy/blob/main/migrations/001_core_schema.sql): Core tables including projects, signals, log_entries, skill_state, memories, user_profiles, scan_rules, and config
+- [RLS Policies](https://github.com/MattVOLTA/outworkos_diy/blob/main/migrations/002_rls_policies.sql): Row-level security policies scoping all data to the authenticated user
+- [Vault Functions](https://github.com/MattVOLTA/outworkos_diy/blob/main/migrations/003_vault_functions.sql): SECURITY DEFINER functions for per-user secret storage in Supabase Vault
+
+## Required Services
+
+- Supabase: Database, authentication, and secrets vault
+- Google Workspace: Gmail, Calendar, Contacts, Drive (requires user's own Google Cloud OAuth credentials)
+- Todoist: Task management via REST API
+
+## Optional Integrations
+
+- [GitHub](https://github.com/MattVOLTA/outworkos_diy/tree/main/skills/start-work): Issue tracking and PR workflow
+- [Fireflies](https://github.com/MattVOLTA/outworkos_diy/tree/main/skills/process-meeting): Meeting transcript processing
+- [Slack](https://github.com/MattVOLTA/outworkos_diy/tree/main/skills/scan): DM signal source for inbox scanning
+- [Pushover](https://github.com/MattVOLTA/outworkos_diy/tree/main/skills/notify-user): Push notifications
+- [LinkedIn](https://github.com/MattVOLTA/outworkos_diy/tree/main/skills/post-linkedin): Post publishing
+- [Netlify](https://github.com/MattVOLTA/outworkos_diy): Deployment management
+- [Xero](https://github.com/MattVOLTA/outworkos_diy/tree/main/skills/xero-connect): Accounting integration
+
+## Source Code
+
+- [GitHub Repository](https://github.com/MattVOLTA/outworkos_diy): Full source code, all 30+ skills, migrations, scripts, and documentation
