@@ -1,0 +1,28 @@
+{
+  "name": "create-outworkos",
+  "version": "1.0.0",
+  "description": "Set up Outwork OS — a personal operating system for knowledge workers, powered by Claude Code.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MattVOLTA/outworkos_diy.git",
+    "directory": "create-outworkos"
+  },
+  "bin": {
+    "create-outworkos": "./index.js"
+  },
+  "files": [
+    "index.js"
+  ],
+  "keywords": [
+    "outworkos",
+    "claude-code",
+    "productivity",
+    "personal-os",
+    "knowledge-worker",
+    "create"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}
