@@ -82,6 +82,14 @@ Enable any of these in `outworkos.config.yaml`:
 
 - GitHub, Fireflies, Slack, Pushover, Limitless Pendant, fal.ai, Xero, LinkedIn, Netlify, Context7
 
+## Website (Netlify)
+
+- **Domain**: outworkos.me
+- **Netlify Site ID**: `e29eb9ba-b564-4c19-940d-837ab5c71ca0`
+- **Source**: `site/` directory
+- **Deploy command**: `netlify deploy --prod --dir=site`
+- **Behavior**: After any change to files in `site/`, ask the user if they'd like to deploy to Netlify.
+
 ## File Structure
 
 ```
